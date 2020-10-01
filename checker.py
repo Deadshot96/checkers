@@ -155,22 +155,22 @@ class Game:
         for block in self.valid_positions.keys():
             block.make_invalid()
 
-        self.valid_positions = dict()
+        self.valid_positions.clear()
+
+    def select(self, piece):
+        if self.selected is not None:
+            self.deselect()
+
+        self.selected = piece
+        self.selected.select()
+        self.show_positions()
 
     def game_move(self, row, col):
         piece = self.grid[row][col]
         destName = str(piece)
 
-        if destName == self.turn and self.selected is None:
-            self.selected = piece
-            self.selected.select()
-            self.show_positions()
-
-        elif destName == self.turn:
-            self.deselect()
-            self.selected = piece
-            self.selected.select()
-            self.show_positions()
+        if destName == self.turn or self.selected is None:
+            self.select(piece)
 
         elif destName.lower() == 'empty':
             if piece in self.valid_positions():
