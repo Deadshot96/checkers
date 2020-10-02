@@ -116,7 +116,7 @@ class Game:
         self._traverse(self.selected)
         print(self.valid_positions)
 
-    def _traverse(self, piece, isSkipped=False):
+    def _traverse(self, piece,jumpCell=None, isSkipped=False):
         row, col = piece.get_pos()
         name = str(piece)
 
@@ -152,7 +152,9 @@ class Game:
             for rowDelta, colDelta in options:
                 nRow = row + rowDelta
                 nCol = col + colDelta
-
+                
+                pieceRow = row + rowDelta // 2
+                pieceCol = col + colDelta // 2
 
 
     def deselect(self):
