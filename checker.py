@@ -271,7 +271,10 @@ class Game:
                         cell.make_player(self.PLAYERS[0])
 
                     if keys[pygame.K_k]:
-                        cell.make_king()
+                        if not cell.is_king():
+                            cell.make_king()
+                        else:
+                            cell.remove_king()
 
 
 
