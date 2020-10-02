@@ -183,7 +183,8 @@ class Game:
 
 
     def deselect(self):
-        self.selected.deselect()
+        if self.selected is not None:
+            self.selected.deselect()
         self.selected = None
         for block in self.valid_positions.keys():
             block.make_invalid()
