@@ -147,7 +147,7 @@ class Game:
 
         else:
             options = [(2 * i, j) for i in piece.direction for j in [2, -2]]
-            row, col = piece.get_pos()
+            row, col = jumpCell.get_pos()
 
             for rowDelta, colDelta in options:
                 nRow = row + rowDelta
@@ -155,6 +155,13 @@ class Game:
                 
                 pieceRow = row + rowDelta // 2
                 pieceCol = col + colDelta // 2
+
+                if self.is_valid_dims(nRow, nCol) and self.is_valid_dims(pieceRow, pieceCol):
+                    dest = self.grid[nRow][nCol]
+                    jump = self.grid[pieceRow][pieceCol]
+
+                    if str(dest) == 'EMPTY' and str(jump) != 'EMPTY' and str(jump) != self.turn:
+                        
 
 
     def deselect(self):
