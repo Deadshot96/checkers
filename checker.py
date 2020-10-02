@@ -132,21 +132,28 @@ class Game:
                         destName = str(dest)
 
                         if destName == "EMPTY":
-                            self.valid_positions[dest] = None
+                            self.valid_positions[dest] = list()
                             dest.make_valid()
 
                         elif destName != self.turn:
                             jumpRow = nRow + rowDelta
                             jumpCol = nCol + colDelta
 
-                            if self.is_valid_dims(jumpRow, jumpCol) and self.grid[jumpRow][jumpCol].is_empty():
+                            if self.is_valid_dims(jumpRow, jumpCol) and str(self.grid[jumpRow][jumpCol]) == 'EMPTY':
                                 jumpCell = self.grid[jumpRow][jumpCol]
 
-                                jumpCell.make_valid()
+                                jumpCell.occupy()
                                 self.valid_positions[jumpCell] = [self.grid[nRow, nCol]]
 
         else:
-            rowDelta = []
+            options = [(2 * i, j) for i in piece.direction for j in [2, -2]]
+            row, col = piece.get_pos()
+
+            for rowDelta, colDelta in options:
+                nRow = row + rowDelta
+                nCol = col + colDelta
+
+
 
     def deselect(self):
         self.selected.deselect()
