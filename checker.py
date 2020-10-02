@@ -144,10 +144,12 @@ class Game:
 
                                 jumpCell.occupy()
                                 self.valid_positions[jumpCell] = [self.grid[nRow, nCol]]
-
+                                self._traverse(piece, jumpCell, True)
+                                jumpCell.vacant()
         else:
             options = [(2 * i, j) for i in piece.direction for j in [2, -2]]
             row, col = jumpCell.get_pos()
+            jumps = self.valid_positions[jumpCell]
 
             for rowDelta, colDelta in options:
                 nRow = row + rowDelta
@@ -160,7 +162,13 @@ class Game:
                     dest = self.grid[nRow][nCol]
                     jump = self.grid[pieceRow][pieceCol]
 
-                    if str(dest) == 'EMPTY' and str(jump) != 'EMPTY' and str(jump) != self.turn:
+                    if str(dest) == 'EMPTY' and dest.is_empty() and str(jump) != 'EMPTY' and str(jump) != self.turn:
+                        dest.occupy()
+                        jumps.append(jump)
+                        self.valid_positions[dest] = jumps
+                        self.valid_positions.pop(jumpCell)
+                        self._traverse(piece, dest, True)
+                        dest.vacant()
                         
 
 
