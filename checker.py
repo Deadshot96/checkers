@@ -115,7 +115,7 @@ class Game:
 
     def show_positions(self):
         row, col = self.selected.get_pos()
-        self._traverse(self.selected)
+        self._traverse()
         print(self.valid_positions)
 
         for key, values in self.valid_positions.items():
@@ -126,12 +126,13 @@ class Game:
                 key.make_valid()
 
 
-    def _traverse(self, piece,jumpCell=None, isSkipped=False):
-        row, col = piece.get_pos()
+    def _traverse(self, jumpCell=None):
+        row, col = self.selected.get_pos()
+        piece = self.selected
         name = str(piece)
 
         print("In Traverse")
-        if not isSkipped:
+        if not jumpCell:
             for rowDelta in piece.direction:
                 for colDelta in [-1, 1]:
                     nRow = row + rowDelta
@@ -154,7 +155,7 @@ class Game:
                                 jumpCell.occupy()
                                 self.valid_positions[jumpCell] = [self.grid[nRow][nCol]]
                                 self.jumpMove = True
-                                self._traverse(piece, jumpCell, True)
+                                self._traverse(jumpCell)
                                 jumpCell.vacant()
         else:
             options = [(2 * i, j) for i in piece.direction for j in [2, -2]]
@@ -178,7 +179,7 @@ class Game:
                         jumps.append(jump)
                         self.valid_positions[dest] = jumps
                         self.valid_positions.pop(jumpCell)
-                        self._traverse(piece, dest, True)
+                        self._traverse(dest)
                         self.grid[nRow][nCol].vacant()
                         
 
@@ -211,12 +212,11 @@ class Game:
         elif destName == self.turn:
             self.select(piece)
 
-        elif destName.lower() == 'empty':
+        elif destName == 'EMPTY':
             if piece in self.valid_positions.keys():
                 self.move_piece(piece)
             else:
                 self.deselect()
-
         else:
             self.deselect()
 
