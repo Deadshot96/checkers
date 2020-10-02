@@ -149,6 +149,7 @@ class Game:
 
                                 jumpCell.occupy()
                                 self.valid_positions[jumpCell] = [self.grid[nRow][nCol]]
+                                self.jumpMove = True
                                 self._traverse(piece, jumpCell, True)
                                 jumpCell.vacant()
         else:
@@ -173,7 +174,6 @@ class Game:
                         self.valid_positions[dest] = jumps
                         self.valid_positions.pop(jumpCell)
                         self._traverse(piece, dest, True)
-                        self.jumpMove = True
                         dest.vacant()
                         
 
