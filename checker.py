@@ -143,7 +143,7 @@ class Game:
                                 jumpCell = self.grid[jumpRow][jumpCol]
 
                                 jumpCell.occupy()
-                                self.valid_positions[jumpCell] = [self.grid[nRow, nCol]]
+                                self.valid_positions[jumpCell] = [self.grid[nRow][nCol]]
                                 self._traverse(piece, jumpCell, True)
                                 jumpCell.vacant()
         else:
@@ -241,6 +241,26 @@ class Game:
                             self.game_move(row, col)
 
                         print(self.grid[row][col])
+
+                if event.type == pygame.KEYDOWN:
+                    keys = pygame.key.get_pressed()
+                    pos = pygame.mouse.get_pos()
+
+                    row, col = self.get_pos(pos)
+                    if self.is_valid_dims(row, col):
+                        cell = self.grid[row][col]
+
+                    if keys[pygame.K_SPACE]:
+                        cell.remove_player()
+
+                    if keys[pygame.K_r]:
+                        cell.make_player(self.PLAYERS[1])
+
+                    if keys[pygame.K_b]:
+                        cell.make_player(self.PLAYERS[0])
+
+
+
 
         pygame.font.quit()
         pygame.quit()
