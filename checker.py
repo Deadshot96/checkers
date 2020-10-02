@@ -119,7 +119,11 @@ class Game:
         print(self.valid_positions)
 
         for key, values in self.valid_positions.items():
-            key.make_valid()
+            if self.jumpMove:
+                if values is not None:
+                    key.make_valid()
+            else:
+                key.make_valid()
 
 
     def _traverse(self, piece,jumpCell=None, isSkipped=False):
@@ -265,6 +269,9 @@ class Game:
 
                     if keys[pygame.K_b]:
                         cell.make_player(self.PLAYERS[0])
+
+                    if keys[pygame.K_k]:
+                        cell.make_king()
 
 
 
