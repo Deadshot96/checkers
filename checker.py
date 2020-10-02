@@ -33,6 +33,7 @@ class Game:
         self.grid = None
         self.clock = None
         self.titleFont = None
+        self.jumpMove = False
 
     def game_init(self):
 
@@ -78,6 +79,7 @@ class Game:
         self.selected = None
         self.valid_positions = dict()
         self.num_valid_moves = 0
+        self.jumpMove = False
 
         # Reset Index
         for rowIndex, row in enumerate(self.grid):
@@ -116,6 +118,10 @@ class Game:
         self._traverse(self.selected)
         print(self.valid_positions)
 
+        for key, values in self.valid_positions.items():
+            key.make_valid()
+
+
     def _traverse(self, piece,jumpCell=None, isSkipped=False):
         row, col = piece.get_pos()
         name = str(piece)
@@ -132,8 +138,7 @@ class Game:
                         destName = str(dest)
 
                         if destName == "EMPTY":
-                            self.valid_positions[dest] = list()
-                            dest.make_valid()
+                            self.valid_positions[dest] = None
 
                         elif destName != self.turn:
                             jumpRow = nRow + rowDelta
@@ -168,6 +173,7 @@ class Game:
                         self.valid_positions[dest] = jumps
                         self.valid_positions.pop(jumpCell)
                         self._traverse(piece, dest, True)
+                        self.jumpMove = True
                         dest.vacant()
                         
 
@@ -179,6 +185,7 @@ class Game:
             block.make_invalid()
 
         self.valid_positions.clear()
+        self.jumpMove = False
 
     def select(self, piece):
         if self.selected is not None:
