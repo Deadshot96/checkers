@@ -135,16 +135,15 @@ class Game:
                             self.valid_positions[dest] = None
                             dest.make_valid()
 
-                        if destName != self.turn:
+                        elif destName != self.turn:
                             jumpRow = nRow + rowDelta
                             jumpCol = nCol + colDelta
 
-                            if self.is_valid_dims(jumpRow, jumpCol):
-                                jump = self.grid[jumpRow][jumpCol]
+                            if self.is_valid_dims(jumpRow, jumpCol) and self.grid[jumpRow][jumpCol].is_empty():
+                                jumpCell = self.grid[jumpRow][jumpCol]
 
-                                if str(jump) == "EMPTY":
-                                    jump.make_valid()
-                                    self.valid_positions[jump] = [dest]
+                                jumpCell.make_valid()
+                                self.valid_positions[jumpCell] = [self.grid[nRow, nCol]]
 
         else:
             rowDelta = []
