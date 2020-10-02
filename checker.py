@@ -169,11 +169,14 @@ class Game:
         piece = self.grid[row][col]
         destName = str(piece)
 
-        if destName == self.turn or self.selected is None:
+        if destName == self.turn and self.selected is None:
+            self.select(piece)
+
+        elif destName == self.turn:
             self.select(piece)
 
         elif destName.lower() == 'empty':
-            if piece in self.valid_positions():
+            if piece in self.valid_positions.keys():
                 self.move_piece(piece)
             else:
                 self.deselect()
