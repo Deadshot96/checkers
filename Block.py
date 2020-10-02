@@ -26,6 +26,7 @@ class Block:
         self.isValid = False
         self.isEmpty = True
         self.selected = False
+        self.inDanger = False
 
     def is_king(self):
         return self.isKing
@@ -33,7 +34,7 @@ class Block:
     def make_king(self):
         self.isKing = True
         self.direction = [1, -1]
-
+        
     def remove_king(self):
         self.isKing = False
         if self.player == colors.RED:
@@ -81,6 +82,15 @@ class Block:
     def is_selected(self):
         return self.selected
 
+    def make_danger(self):
+        self.inDanger = True
+
+    def make_safe(self):
+        self.inDanger = False
+
+    def is_safe(self):
+        return self.inDanger
+
     def deselect(self):
         self.selected = False
 
@@ -113,8 +123,8 @@ class Block:
 
         if self.player is not None:
 
-            if self.is_selected():
-                color = colors.LAWN_GREEN
+            if self.is_selected() or self.is_safe():
+                color = colors.LAWN_GREEN if self.is_selected() else colors.GOLD
                 surface = pygame.Surface((self.size, self.size))
                 surface.set_colorkey(colors.KEY)
                 surface.set_alpha(128)
