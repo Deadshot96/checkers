@@ -34,6 +34,14 @@ class Block:
         self.isKing = True
         self.direction = [1, -1]
 
+    def remove_king(self):
+        self.isKing = False
+        if self.player == colors.RED:
+            self.direction = [-1]
+        elif self.player == colors.BLUE:
+            self.direction = [1]
+
+
     def get_pos(self):
         return self.row, self.col
 
