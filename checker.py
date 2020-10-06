@@ -77,7 +77,8 @@ class Game:
         self.CYCLE = itertools.cycle(self.TURNS)
         self.turn = next(self.CYCLE)
         self.selected = None
-        self.valid_positions = dict()
+        self.valid_positions = list()
+        self.path_dict = dict()
         self.num_valid_moves = 0
         self.jumpMove = False
 
@@ -144,7 +145,8 @@ class Game:
 
                         if destName == "EMPTY":
                             pass
-                        
+
+
 
         else:
             pass
