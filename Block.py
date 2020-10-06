@@ -27,6 +27,7 @@ class Block:
         self.isEmpty = True
         self.selected = False
         self.inDanger = False
+        self.isOccupied = False
 
     def is_king(self):
         return self.isKing
@@ -68,6 +69,8 @@ class Block:
             self.direction = [1]
         elif player == colors.RED:
             self.direction = [-1]
+
+        self.isEmpty = False
         
     def remove_player(self):
         self.player = None
@@ -93,13 +96,13 @@ class Block:
         self.selected = False
 
     def occupy(self):
-        self.isEmpty = False
+        self.isOccupied = False
 
     def vacant(self):
-        self.isEmpty = True
+        self.isOccupied = True
 
     def is_occupied(self):
-        return self.isEmpty
+        return self.isOccupied
 
     def __repr__(self):
         if self.player == colors.RED:

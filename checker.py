@@ -114,9 +114,15 @@ class Game:
     def is_cool(self):
         self.cooldown_index == 0
 
+    def unoccupy_grid(self):
+        for row in self.grid:
+            for cell in row:
+                cell.vacant()
+
     def show_positions(self):
         row, col = self.selected.get_pos()
         self.jumpMove = False
+        self.unoccupy_grid()
         self.__traverse__()
         print("Valid pos: ", list(map(lambda x: x.get_pos(), self.valid_positions)))
 
