@@ -117,15 +117,21 @@ class Game:
     def show_positions(self):
         row, col = self.selected.get_pos()
         self.jumpMove = False
-        self._traverse()
+        self.__traverse__()
         print(self.valid_positions)
 
-        for key, values in self.valid_positions.items():
-            if self.jumpMove:
-                if values is not None:
-                    key.make_valid()
-            else:
-                key.make_valid()
+        for dest in self.valid_positions:
+            path = list()
+            current = dest
+            while current is not self.selected:
+                current = self.path_dict[current]
+                path.append(current)
+
+            dest.make_valid()
+            print(path)
+            print(self.jumpMove)
+
+
 
     def __traverse__(self, jumpCell = None):
         row, col = self.selected.get_pos()
@@ -147,7 +153,7 @@ class Game:
                     destName = str(dest)
 
                     if destName == "EMPTY":
-                        self.valid_positions.append(self.selected) 
+                        self.valid_positions.append(dest) 
                         self.path_dict[dest] = self.selected
 
                     elif destName != self.turn:
@@ -158,15 +164,16 @@ class Game:
                             jumpCell = self.grid[jumpRow][jumpCol]
 
                             jumpCell.occupy()
-                            self.valid_positions.append(jumpCell)
-                            self.path_dict[jumpCell] = dest
+                            # self.valid_positions.append(jumpCell)
+                            # This dict should always be updated before __traverse__ call
+                            self.path_dict[jumpCell] = self.selected
                             self.__traverse__(jumpCell)
                             self.jumpMove = True
                             jumpCell.vacant()
         else:
             options = [(2 * i, j) for i in self.selected.direction for j in (-2, 2)]
             row, col = jumpCell.get_pos()
-
+            validForFinalStop = True
 
             for rowDelta, colDelta in options:
                 nRow = row + rowDelta
@@ -178,9 +185,18 @@ class Game:
                 if self.is_valid_dims(nRow, nCol) and self.is_valid_dims(midRow, midCol):
                     dest = self.grid[nRow][nCol]
                     midCell = self.grid[midRow][midCol]
-                    
+
                     if str(dest) == "EMPTY" and str(midCell) != "EMPTY" and not dest.is_occupied() and str(midCell) != self.turn:
-                        pass
+                        validForFinalStop = False
+                        dest.occupy()
+                        # This dict should always be updated before __traverse__ call
+                        self.path_dict[dest] = jumpCell 
+                        self.__traverse__(dest)
+                        dest.vacant()
+
+            if validForFinalStop:
+                self.valid_positions.append(jumpCell)
+
 
 
     def _traverse(self, jumpCell=None):
@@ -245,7 +261,7 @@ class Game:
         if self.selected is not None:
             self.selected.deselect()
         self.selected = None
-        for block in self.valid_positions.keys():
+        for block in self.valid_positions:
             block.make_invalid()
 
         self.valid_positions.clear()
@@ -270,7 +286,7 @@ class Game:
             self.select(piece)
 
         elif destName == 'EMPTY':
-            if piece in self.valid_positions.keys():
+            if piece in self.valid_positions:
                 self.move_piece(piece)
             else:
                 self.deselect()
