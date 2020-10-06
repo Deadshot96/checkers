@@ -126,7 +126,28 @@ class Game:
                 key.make_valid()
 
     def __traverse__(self, jumpCell = None):
-        pass
+        row, col = self.selected.get_pos()
+        name = str(self.selected)
+
+        if not jumpCell:
+            # Starting the travel - no jump yet
+            # check the basic positions
+            
+            for rowDelta in self.selected.direction:
+                for colDelta in [-1, 1]:
+                    nRow = row + rowDelta
+                    nCol = col + colDelta
+
+                    if self.is_valid_dims(nRow, nCol):
+                        dest = self.grid[nRow][nCol]
+                        destName = str(dest)
+
+                        if destName == "EMPTY":
+                            pass
+                        
+
+        else:
+            pass
 
     def _traverse(self, jumpCell=None):
         row, col = self.selected.get_pos()
