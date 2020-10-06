@@ -68,9 +68,7 @@ class Block:
             self.direction = [1]
         elif player == colors.RED:
             self.direction = [-1]
-
-        self.isEmpty = False
-
+        
     def remove_player(self):
         self.player = None
         self.direction = []

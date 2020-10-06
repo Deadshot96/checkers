@@ -118,7 +118,7 @@ class Game:
         row, col = self.selected.get_pos()
         self.jumpMove = False
         self.__traverse__()
-        print(self.valid_positions)
+        print("Valid pos: ", list(map(lambda x: x.get_pos(), self.valid_positions)))
 
         for dest in self.valid_positions:
             path = list()
@@ -128,8 +128,8 @@ class Game:
                 path.append(current)
 
             dest.make_valid()
-            print(path)
-            print(self.jumpMove)
+            print("Path is :", path)
+            print("Jump Move is ", self.jumpMove)
 
 
 
@@ -174,19 +174,33 @@ class Game:
             options = [(2 * i, j) for i in self.selected.direction for j in (-2, 2)]
             row, col = jumpCell.get_pos()
             validForFinalStop = True
-
+            print("In jumpCell", row, col, sep="\t")
             for rowDelta, colDelta in options:
                 nRow = row + rowDelta
                 nCol = col + colDelta
+                print(nRow, nCol, sep="\t\t")
 
                 midRow = row + rowDelta // 2
                 midCol = col + colDelta // 2
+                print(midRow, midCol, sep="\t\t")
 
                 if self.is_valid_dims(nRow, nCol) and self.is_valid_dims(midRow, midCol):
                     dest = self.grid[nRow][nCol]
                     midCell = self.grid[midRow][midCol]
+                    print("It's valid.")
+
+                    if str(dest) == "EMPTY":
+                        print("Dest Empty")
+                    if str(midCell) != "EMPTY":
+                        print("MidCell not Empty")
+                    if str(midCell) != self.turn:
+                        print("MidCell opposite.")
+                    if not dest.is_occupied():
+                        print("Not occupied")
+        
 
                     if str(dest) == "EMPTY" and str(midCell) != "EMPTY" and not dest.is_occupied() and str(midCell) != self.turn:
+                        print("Inside jumpcell if.")
                         validForFinalStop = False
                         dest.occupy()
                         # This dict should always be updated before __traverse__ call
@@ -198,62 +212,61 @@ class Game:
                 self.valid_positions.append(jumpCell)
 
 
+    # def _traverse(self, jumpCell=None):
+    #     row, col = self.selected.get_pos()
+    #     piece = self.selected
+    #     name = str(piece)
 
-    def _traverse(self, jumpCell=None):
-        row, col = self.selected.get_pos()
-        piece = self.selected
-        name = str(piece)
+    #     print("In Traverse")
+    #     if not jumpCell:
+    #         for rowDelta in piece.direction:
+    #             for colDelta in [-1, 1]:
+    #                 nRow = row + rowDelta
+    #                 nCol = col + colDelta
 
-        print("In Traverse")
-        if not jumpCell:
-            for rowDelta in piece.direction:
-                for colDelta in [-1, 1]:
-                    nRow = row + rowDelta
-                    nCol = col + colDelta
+    #                 if self.is_valid_dims(nRow, nCol):
+    #                     dest = self.grid[nRow][nCol]
+    #                     destName = str(dest)
 
-                    if self.is_valid_dims(nRow, nCol):
-                        dest = self.grid[nRow][nCol]
-                        destName = str(dest)
+    #                     if destName == "EMPTY":
+    #                         self.valid_positions[dest] = None
 
-                        if destName == "EMPTY":
-                            self.valid_positions[dest] = None
+    #                     elif destName != self.turn:
+    #                         jumpRow = nRow + rowDelta
+    #                         jumpCol = nCol + colDelta
 
-                        elif destName != self.turn:
-                            jumpRow = nRow + rowDelta
-                            jumpCol = nCol + colDelta
+    #                         if self.is_valid_dims(jumpRow, jumpCol) and str(self.grid[jumpRow][jumpCol]) == 'EMPTY':
+    #                             jumpCell = self.grid[jumpRow][jumpCol]
 
-                            if self.is_valid_dims(jumpRow, jumpCol) and str(self.grid[jumpRow][jumpCol]) == 'EMPTY':
-                                jumpCell = self.grid[jumpRow][jumpCol]
+    #                             jumpCell.occupy()
+    #                             self.valid_positions[jumpCell] = [self.grid[nRow][nCol]]
+    #                             self.jumpMove = True
+    #                             self._traverse(jumpCell)
+    #                             jumpCell.vacant()
+    #     else:
+    #         options = [(2 * i, j) for i in piece.direction for j in [2, -2]]
+    #         row, col = jumpCell.get_pos()
+    #         jumps = self.valid_positions[jumpCell]
+    #         print(row, col, sep='\t\t')
 
-                                jumpCell.occupy()
-                                self.valid_positions[jumpCell] = [self.grid[nRow][nCol]]
-                                self.jumpMove = True
-                                self._traverse(jumpCell)
-                                jumpCell.vacant()
-        else:
-            options = [(2 * i, j) for i in piece.direction for j in [2, -2]]
-            row, col = jumpCell.get_pos()
-            jumps = self.valid_positions[jumpCell]
-            print(row, col, sep='\t\t')
-
-            for rowDelta, colDelta in options:
-                nRow = row + rowDelta
-                nCol = col + colDelta
+    #         for rowDelta, colDelta in options:
+    #             nRow = row + rowDelta
+    #             nCol = col + colDelta
                 
-                pieceRow = row + rowDelta // 2
-                pieceCol = col + colDelta // 2
+    #             pieceRow = row + rowDelta // 2
+    #             pieceCol = col + colDelta // 2
 
-                if self.is_valid_dims(nRow, nCol) and self.is_valid_dims(pieceRow, pieceCol):
-                    dest = self.grid[nRow][nCol]
-                    jump = self.grid[pieceRow][pieceCol]
+    #             if self.is_valid_dims(nRow, nCol) and self.is_valid_dims(pieceRow, pieceCol):
+    #                 dest = self.grid[nRow][nCol]
+    #                 jump = self.grid[pieceRow][pieceCol]
 
-                    if str(dest) == 'EMPTY' and dest.is_empty() and str(jump) != 'EMPTY' and str(jump) != self.turn:
-                        self.grid[nRow][nCol].occupy()
-                        jumps.append(jump)
-                        self.valid_positions[dest] = jumps
-                        self.valid_positions.pop(jumpCell)
-                        self._traverse(dest)
-                        self.grid[nRow][nCol].vacant()
+    #                 if str(dest) == 'EMPTY' and dest.is_empty() and str(jump) != 'EMPTY' and str(jump) != self.turn:
+    #                     self.grid[nRow][nCol].occupy()
+    #                     jumps.append(jump)
+    #                     self.valid_positions[dest] = jumps
+    #                     self.valid_positions.pop(jumpCell)
+    #                     self._traverse(dest)
+    #                     self.grid[nRow][nCol].vacant()
                         
 
 
@@ -265,6 +278,7 @@ class Game:
             block.make_invalid()
 
         self.valid_positions.clear()
+        self.path_dict.clear()
         self.jumpMove = False
 
     def select(self, piece):
