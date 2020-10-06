@@ -124,7 +124,7 @@ class Block:
         if self.player is not None:
 
             if self.is_selected() or self.is_safe():
-                color = colors.LAWN_GREEN if self.is_selected() else colors.GOLD
+                color = colors.LAWN_GREEN if self.is_selected() else colors.PINK
                 surface = pygame.Surface((self.size, self.size))
                 surface.set_colorkey(colors.KEY)
                 surface.set_alpha(128)
