@@ -96,10 +96,10 @@ class Block:
         self.selected = False
 
     def occupy(self):
-        self.isOccupied = False
+        self.isOccupied = True
 
     def vacant(self):
-        self.isOccupied = True
+        self.isOccupied = False
 
     def is_occupied(self):
         return self.isOccupied
