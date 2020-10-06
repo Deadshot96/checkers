@@ -144,7 +144,18 @@ class Game:
                         destName = str(dest)
 
                         if destName == "EMPTY":
-                            pass
+                            self.valid_positions.append(self.selected) 
+                            self.path_dict[dest] = self.selected
+
+                        elif destName != self.turn:
+                            jumpRow = nRow + rowDelta
+                            jumpCol = nCol + colDelta
+
+                            if self.is_valid_dims(jumpRow, jumpCol):
+                                jumpCell = self.grid[jumpRow][jumpCol]
+
+                                jumpCell.occupy()
+                                
 
 
 
