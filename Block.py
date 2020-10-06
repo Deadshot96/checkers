@@ -27,6 +27,7 @@ class Block:
         self.isEmpty = True
         self.selected = False
         self.inDanger = False
+        self.isOccupied = False
 
     def is_king(self):
         return self.isKing
@@ -70,7 +71,7 @@ class Block:
             self.direction = [-1]
 
         self.isEmpty = False
-
+        
     def remove_player(self):
         self.player = None
         self.direction = []
@@ -95,13 +96,13 @@ class Block:
         self.selected = False
 
     def occupy(self):
-        self.isEmpty = False
+        self.isOccupied = True
 
     def vacant(self):
-        self.isEmpty = True
+        self.isOccupied = False
 
     def is_occupied(self):
-        return self.isEmpty
+        return self.isOccupied
 
     def __repr__(self):
         if self.player == colors.RED:
@@ -124,7 +125,7 @@ class Block:
         if self.player is not None:
 
             if self.is_selected() or self.is_safe():
-                color = colors.LAWN_GREEN if self.is_selected() else colors.GOLD
+                color = colors.LAWN_GREEN if self.is_selected() else colors.PINK
                 surface = pygame.Surface((self.size, self.size))
                 surface.set_colorkey(colors.KEY)
                 surface.set_alpha(128)

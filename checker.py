@@ -77,7 +77,8 @@ class Game:
         self.CYCLE = itertools.cycle(self.TURNS)
         self.turn = next(self.CYCLE)
         self.selected = None
-        self.valid_positions = dict()
+        self.valid_positions = list()
+        self.path_dict = dict()
         self.num_valid_moves = 0
         self.jumpMove = False
 
@@ -113,74 +114,165 @@ class Game:
     def is_cool(self):
         self.cooldown_index == 0
 
+    def unoccupy_grid(self):
+        for row in self.grid:
+            for cell in row:
+                cell.vacant()
+
     def show_positions(self):
         row, col = self.selected.get_pos()
-        self._traverse()
-        print(self.valid_positions)
+        self.jumpMove = False
+        self.unoccupy_grid()
+        self.__traverse__()
+        print("Valid pos: ", list(map(lambda x: x.get_pos(), self.valid_positions)))
 
-        for key, values in self.valid_positions.items():
-            if self.jumpMove:
-                if values is not None:
-                    key.make_valid()
-            else:
-                key.make_valid()
+        for dest in self.valid_positions:
+            path = list()
+            current = dest
+            while current is not self.selected:
+                current = self.path_dict[current]
+                path.append(current)
+
+            dest.make_valid()
+            print("Path is :", path)
+            print("Jump Move is ", self.jumpMove)
 
 
-    def _traverse(self, jumpCell=None):
+
+    def __traverse__(self, jumpCell = None):
         row, col = self.selected.get_pos()
-        piece = self.selected
-        name = str(piece)
+        name = str(self.selected)
 
-        print("In Traverse")
         if not jumpCell:
-            for rowDelta in piece.direction:
-                for colDelta in [-1, 1]:
-                    nRow = row + rowDelta
-                    nCol = col + colDelta
+            # Starting the travel - no jump yet
+            # check the basic positions
 
-                    if self.is_valid_dims(nRow, nCol):
-                        dest = self.grid[nRow][nCol]
-                        destName = str(dest)
+            options = [(i, j) for i in self.selected.direction for j in (-1, 1)]
+            
+            for rowDelta, colDelta in options:
+                
+                nRow = row + rowDelta
+                nCol = col + colDelta
 
-                        if destName == "EMPTY":
-                            self.valid_positions[dest] = None
+                if self.is_valid_dims(nRow, nCol):
+                    dest = self.grid[nRow][nCol]
+                    destName = str(dest)
 
-                        elif destName != self.turn:
-                            jumpRow = nRow + rowDelta
-                            jumpCol = nCol + colDelta
+                    if destName == "EMPTY":
+                        self.valid_positions.append(dest) 
+                        self.path_dict[dest] = self.selected
 
-                            if self.is_valid_dims(jumpRow, jumpCol) and str(self.grid[jumpRow][jumpCol]) == 'EMPTY':
-                                jumpCell = self.grid[jumpRow][jumpCol]
+                    elif destName != self.turn:
+                        jumpRow = nRow + rowDelta
+                        jumpCol = nCol + colDelta
 
-                                jumpCell.occupy()
-                                self.valid_positions[jumpCell] = [self.grid[nRow][nCol]]
-                                self.jumpMove = True
-                                self._traverse(jumpCell)
-                                jumpCell.vacant()
+                        if self.is_valid_dims(jumpRow, jumpCol) and str(self.grid[jumpRow][jumpCol]) == "EMPTY":
+                            jumpCell = self.grid[jumpRow][jumpCol]
+
+                            jumpCell.occupy()
+                            # self.valid_positions.append(jumpCell)
+                            # This dict should always be updated before __traverse__ call
+                            self.path_dict[jumpCell] = self.selected
+                            self.__traverse__(jumpCell)
+                            self.jumpMove = True
+                            jumpCell.vacant()
         else:
-            options = [(2 * i, j) for i in piece.direction for j in [2, -2]]
+            options = [(2 * i, j) for i in self.selected.direction for j in (-2, 2)]
             row, col = jumpCell.get_pos()
-            jumps = self.valid_positions[jumpCell]
-            print(row, col, sep='\t\t')
-
+            validForFinalStop = True
+            print("In jumpCell", row, col, sep="\t")
             for rowDelta, colDelta in options:
                 nRow = row + rowDelta
                 nCol = col + colDelta
-                
-                pieceRow = row + rowDelta // 2
-                pieceCol = col + colDelta // 2
+                print(nRow, nCol, sep="\t\t")
 
-                if self.is_valid_dims(nRow, nCol) and self.is_valid_dims(pieceRow, pieceCol):
+                midRow = row + rowDelta // 2
+                midCol = col + colDelta // 2
+                print(midRow, midCol, sep="\t\t")
+
+                if self.is_valid_dims(nRow, nCol) and self.is_valid_dims(midRow, midCol):
                     dest = self.grid[nRow][nCol]
-                    jump = self.grid[pieceRow][pieceCol]
+                    midCell = self.grid[midRow][midCol]
+                    print("It's valid.")
 
-                    if str(dest) == 'EMPTY' and dest.is_empty() and str(jump) != 'EMPTY' and str(jump) != self.turn:
-                        self.grid[nRow][nCol].occupy()
-                        jumps.append(jump)
-                        self.valid_positions[dest] = jumps
-                        self.valid_positions.pop(jumpCell)
-                        self._traverse(dest)
-                        self.grid[nRow][nCol].vacant()
+                    if str(dest) == "EMPTY":
+                        print("Dest Empty")
+                    if str(midCell) != "EMPTY":
+                        print("MidCell not Empty")
+                    if str(midCell) != self.turn:
+                        print("MidCell opposite.")
+                    if not dest.is_occupied():
+                        print("Not occupied")
+        
+
+                    if str(dest) == "EMPTY" and str(midCell) != "EMPTY" and not dest.is_occupied() and str(midCell) != self.turn:
+                        print("Inside jumpcell if.")
+                        validForFinalStop = False
+                        dest.occupy()
+                        # This dict should always be updated before __traverse__ call
+                        self.path_dict[dest] = jumpCell 
+                        self.__traverse__(dest)
+                        dest.vacant()
+
+            if validForFinalStop:
+                self.valid_positions.append(jumpCell)
+
+
+    # def _traverse(self, jumpCell=None):
+    #     row, col = self.selected.get_pos()
+    #     piece = self.selected
+    #     name = str(piece)
+
+    #     print("In Traverse")
+    #     if not jumpCell:
+    #         for rowDelta in piece.direction:
+    #             for colDelta in [-1, 1]:
+    #                 nRow = row + rowDelta
+    #                 nCol = col + colDelta
+
+    #                 if self.is_valid_dims(nRow, nCol):
+    #                     dest = self.grid[nRow][nCol]
+    #                     destName = str(dest)
+
+    #                     if destName == "EMPTY":
+    #                         self.valid_positions[dest] = None
+
+    #                     elif destName != self.turn:
+    #                         jumpRow = nRow + rowDelta
+    #                         jumpCol = nCol + colDelta
+
+    #                         if self.is_valid_dims(jumpRow, jumpCol) and str(self.grid[jumpRow][jumpCol]) == 'EMPTY':
+    #                             jumpCell = self.grid[jumpRow][jumpCol]
+
+    #                             jumpCell.occupy()
+    #                             self.valid_positions[jumpCell] = [self.grid[nRow][nCol]]
+    #                             self.jumpMove = True
+    #                             self._traverse(jumpCell)
+    #                             jumpCell.vacant()
+    #     else:
+    #         options = [(2 * i, j) for i in piece.direction for j in [2, -2]]
+    #         row, col = jumpCell.get_pos()
+    #         jumps = self.valid_positions[jumpCell]
+    #         print(row, col, sep='\t\t')
+
+    #         for rowDelta, colDelta in options:
+    #             nRow = row + rowDelta
+    #             nCol = col + colDelta
+                
+    #             pieceRow = row + rowDelta // 2
+    #             pieceCol = col + colDelta // 2
+
+    #             if self.is_valid_dims(nRow, nCol) and self.is_valid_dims(pieceRow, pieceCol):
+    #                 dest = self.grid[nRow][nCol]
+    #                 jump = self.grid[pieceRow][pieceCol]
+
+    #                 if str(dest) == 'EMPTY' and dest.is_empty() and str(jump) != 'EMPTY' and str(jump) != self.turn:
+    #                     self.grid[nRow][nCol].occupy()
+    #                     jumps.append(jump)
+    #                     self.valid_positions[dest] = jumps
+    #                     self.valid_positions.pop(jumpCell)
+    #                     self._traverse(dest)
+    #                     self.grid[nRow][nCol].vacant()
                         
 
 
@@ -188,10 +280,11 @@ class Game:
         if self.selected is not None:
             self.selected.deselect()
         self.selected = None
-        for block in self.valid_positions.keys():
+        for block in self.valid_positions:
             block.make_invalid()
 
         self.valid_positions.clear()
+        self.path_dict.clear()
         self.jumpMove = False
 
     def select(self, piece):
@@ -213,7 +306,7 @@ class Game:
             self.select(piece)
 
         elif destName == 'EMPTY':
-            if piece in self.valid_positions.keys():
+            if piece in self.valid_positions:
                 self.move_piece(piece)
             else:
                 self.deselect()
