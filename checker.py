@@ -165,7 +165,23 @@ class Game:
                             jumpCell.vacant()
         else:
             options = [(2 * i, j) for i in self.selected.direction for j in (-2, 2)]
-            
+            row, col = jumpCell.get_pos()
+
+
+            for rowDelta, colDelta in options:
+                nRow = row + rowDelta
+                nCol = col + colDelta
+
+                midRow = row + rowDelta // 2
+                midCol = col + colDelta // 2
+
+                if self.is_valid_dims(nRow, nCol) and self.is_valid_dims(midRow, midCol):
+                    dest = self.grid[nRow][nCol]
+                    midCell = self.grid[midRow][midCol]
+                    
+                    if str(dest) == "EMPTY" and str(midCell) != "EMPTY" and not dest.is_occupied() and str(midCell) != self.turn:
+                        pass
+
 
     def _traverse(self, jumpCell=None):
         row, col = self.selected.get_pos()
