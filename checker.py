@@ -125,6 +125,8 @@ class Game:
             else:
                 key.make_valid()
 
+    def __traverse__(self, jumpCell = None):
+        pass
 
     def _traverse(self, jumpCell=None):
         row, col = self.selected.get_pos()
