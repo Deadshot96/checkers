@@ -116,6 +116,7 @@ class Game:
 
     def show_positions(self):
         row, col = self.selected.get_pos()
+        self.jumpMove = False
         self._traverse()
         print(self.valid_positions)
 
@@ -133,34 +134,38 @@ class Game:
         if not jumpCell:
             # Starting the travel - no jump yet
             # check the basic positions
+
+            options = [(i, j) for i in self.selected.direction for j in (-1, 1)]
             
-            for rowDelta in self.selected.direction:
-                for colDelta in [-1, 1]:
-                    nRow = row + rowDelta
-                    nCol = col + colDelta
+            for rowDelta, colDelta in options:
+                
+                nRow = row + rowDelta
+                nCol = col + colDelta
 
-                    if self.is_valid_dims(nRow, nCol):
-                        dest = self.grid[nRow][nCol]
-                        destName = str(dest)
+                if self.is_valid_dims(nRow, nCol):
+                    dest = self.grid[nRow][nCol]
+                    destName = str(dest)
 
-                        if destName == "EMPTY":
-                            self.valid_positions.append(self.selected) 
-                            self.path_dict[dest] = self.selected
+                    if destName == "EMPTY":
+                        self.valid_positions.append(self.selected) 
+                        self.path_dict[dest] = self.selected
 
-                        elif destName != self.turn:
-                            jumpRow = nRow + rowDelta
-                            jumpCol = nCol + colDelta
+                    elif destName != self.turn:
+                        jumpRow = nRow + rowDelta
+                        jumpCol = nCol + colDelta
 
-                            if self.is_valid_dims(jumpRow, jumpCol):
-                                jumpCell = self.grid[jumpRow][jumpCol]
+                        if self.is_valid_dims(jumpRow, jumpCol) and str(self.grid[jumpRow][jumpCol]) == "EMPTY":
+                            jumpCell = self.grid[jumpRow][jumpCol]
 
-                                jumpCell.occupy()
-                                
-
-
-
+                            jumpCell.occupy()
+                            self.valid_positions.append(jumpCell)
+                            self.path_dict[jumpCell] = dest
+                            self.__traverse__(jumpCell)
+                            self.jumpMove = True
+                            jumpCell.vacant()
         else:
-            pass
+            options = [(2 * i, j) for i in self.selected.direction for j in (-2, 2)]
+            
 
     def _traverse(self, jumpCell=None):
         row, col = self.selected.get_pos()
