@@ -138,7 +138,6 @@ class Game:
             print("Jump Move is ", self.jumpMove)
 
 
-
     def __traverse__(self, jumpCell = None):
         row, col = self.selected.get_pos()
         name = str(self.selected)
