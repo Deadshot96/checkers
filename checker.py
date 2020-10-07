@@ -217,8 +217,7 @@ class Game:
             if validForFinalStop:
                 self.valid_positions.append(jumpCell)
 
-
-                        
+                       
 
 
     def deselect(self):
